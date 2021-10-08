@@ -1,8 +1,12 @@
 package com.udacity.asteroidradar.api
+
 import android.annotation.SuppressLint
 import android.net.ParseException
-import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.Constants
+import com.udacity.asteroidradar.DailyPicture
+import com.udacity.asteroidradar.utils.DateUtils
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -162,4 +166,22 @@ private fun getDateFromString(closeApproachDate: String, id: Long): Date {
 
 private fun getNearEarthObjects(asteroidsFullData: Map<*, *>): Map<*, *> {
     return asteroidsFullData["near_earth_objects"] as Map<*, *>
+}
+
+fun parseDailyPicture(rawPictureData: Map<*, *>): DailyPicture {
+    Timber.i("parseDailyPicture() start")
+
+    val rawDate = rawPictureData["date"] as String
+    val date = DateUtils.getDateFromString(
+        rawDate,
+        "Parse of date of daily picture failed."
+    )
+
+    return DailyPicture(
+        id = rawDate,
+        date = date,
+        title = rawPictureData["title"] as String,
+        mediaType = rawPictureData["media_type"] as String,
+        url = rawPictureData["url"] as String
+    )
 }

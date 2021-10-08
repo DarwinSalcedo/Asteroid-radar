@@ -1,18 +1,17 @@
 package com.udacity.asteroidradar.repository
 
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.domain.Asteroid
+import com.udacity.asteroidradar.DailyPicture
 import com.udacity.asteroidradar.api.parseAsteroids
+import com.udacity.asteroidradar.api.parseDailyPicture
 import com.udacity.asteroidradar.network.asDatabaseModel
-import com.udacity.asteroidradar.network.asDomainModel
 import com.udacity.asteroidradar.room.AsteroidsDatabase
 import com.udacity.asteroidradar.utils.DateUtils
-import com.udacity.asteroidradar.utils.DateUtils.Companion.getCurrentDateTime
-import com.udacity.asteroidradar.utils.DateUtils.Companion.toFormat
+import com.udacity.asteroidradar.utils.DateUtils.Companion.toAsteroidsDateString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.*
 import com.udacity.asteroidradar.network.AsteroidApiService.AsteroidsApi.retrofitService as AsteroidService
 
@@ -26,21 +25,23 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
     the most recent request.*/
 //    private val _status = MutableLiveData<AsteroidsApiStatus>()
 
-    val date: Date = Date()
+    val date: Date = DateUtils.getDateWithoutTime()
 
 
-    val asteroids: LiveData<List<Asteroid>> =
-        Transformations.map(database.asteroidDao.getAsteroids()) {
-            it.asDomainModel()
-        }
-
-
+    /**
+     * Refresh the Asteroid data stored in the offline cache.
+     *
+     * This function uses the IO dispatcher to ensure the database insert database operation
+     * happens on the I0 dispatcher. By switching to the I0 dispatcher using 'withContext this
+     * function is now safe to call from any thread including the Main thread.
+     *
+     * To actually load the asteroids for use, observe asteroids.
+     */
     suspend fun refreshAsteroids() {
-        val currentDate = getCurrentDateTime()
-        val endDate: String =
-            DateUtils.getDate6DaysLater(currentDate).toFormat(ASTEROIDS_DATE_FORMAT)
-        val startDate: String = currentDate.toFormat(ASTEROIDS_DATE_FORMAT)
-       // Timber.i("refreshAsteroids() before server call. startDate: $startDate, endDate: $endDate")
+        val currentDate = DateUtils.getDateWithoutTime()
+        val endDate = DateUtils.getDate6DaysLater(currentDate).toAsteroidsDateString()
+        val startDate: String = currentDate.toAsteroidsDateString()
+        Timber.i("refreshAsteroids() before server call. startDate: $startDate, endDate: $endDate")
 
         withContext(Dispatchers.IO) {
             val asteroidsFullData = AsteroidService.getAsteroids(startDate, endDate)
@@ -49,5 +50,24 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
 
             database.asteroidDao.insertAll(*asteroids.asDatabaseModel())
         }
+
+        Timber.i("refreshAsteroids() after server call. startDate: $startDate, endDate: $endDate")
+    }
+
+    suspend fun refreshDailyPicture() {
+        Timber.i("refreshDailyPicture() before server call.")
+
+        withContext(Dispatchers.IO) {
+            try {
+                val rawDailyPicture = AsteroidService.getDailyPictureData() as Map<*, *>
+                val dailyPicture: DailyPicture = parseDailyPicture(rawDailyPicture)
+                Timber.i("refreshDailyPicture() rawPictureDataAny: $rawDailyPicture")
+                database.dailyPictureDao.insert(dailyPicture.asDatabaseModel())
+            } catch (exc: Exception) {
+                Timber.e("refreshDailyPicture()  ${exc.message}")
+            }
+        }
+
+        Timber.i("refreshDailyPicture() after server call.")
     }
 }

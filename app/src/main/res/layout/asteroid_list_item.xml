@@ -11,7 +11,7 @@
         <!-- Data of current asteroid -->
         <variable
             name="asteroid"
-            type="com.udacity.asteroidradar.Asteroid" />
+            type="com.udacity.asteroidradar.domain.Asteroid" />
 
         <!-- Currently we tell type but not source of data -->
         <variable

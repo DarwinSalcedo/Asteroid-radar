@@ -2,7 +2,7 @@ package com.udacity.asteroidradar.network
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -15,8 +15,7 @@ private const val ASTEROIDS_API_DATE_FORMAT = "yyyy-MM-dd"
 
 enum class AsteroidsApiFilter(val value: String) {
     VIEW_WEEK_ASTEROIDS("view.week.asteroids"),
-    VIEW_TODAY_ASTEROIDS
-        ("view.today.asteroids"),
+    VIEW_TODAY_ASTEROIDS("view.today.asteroids"),
     VIEW_SAVED_ASTEROIDS("view.saved.asteroids")
 }
 
@@ -57,8 +56,13 @@ interface AsteroidApiService {
         endDate: String = "2021-04-20",
         @Query("api_key")
         key: String = API_KEY
-    )
-            : Any
+    ): Any
+
+    @GET("planetary/apod")
+    suspend fun getDailyPictureData(
+        @Query("api_key")
+        key: String = API_KEY
+    ): Any
 
     // I need a JsonObject or something I can transform into a JsonObject.
     // I tried those:

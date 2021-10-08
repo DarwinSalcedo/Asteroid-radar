@@ -6,11 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [DatabaseAsteroid::class], version = 1)
+@Database(entities = [DatabaseAsteroid::class,DatabaseDailyPicture::class], version = 2)
 @TypeConverters(Converters::class)
 abstract class AsteroidsDatabase : RoomDatabase() {
 
     abstract val asteroidDao: AsteroidDao
+    abstract val dailyPictureDao: DailyPictureDao
 
     companion object {
         @Volatile

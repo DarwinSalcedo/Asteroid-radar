@@ -23,4 +23,10 @@
     <string name="image_of_the_day_view_description">NASA\'s image of the day</string>
     <string name="activity_main_image_of_the_day__content_description">Image shows whether asteroid is potentialy hazardous. It\'s a funny picture.</string>
     <string name="help_button__content_description">Button for help info</string>
+    <string name="astronomicalUnit_help_button_content_description">Astronomical unit help info</string>
+    <string name="title_of_daily_picture__content_description">Title of image of the day</string>
+    <string name="HazardousText">hazardous</string>
+    <string name="SafeText">safe</string>
+    <string name="asteroidStatusImage_asteroidHazardous_contentDescription">Asteroid is potentially hazardous</string>
+    <string name="asteroidStatusImage_asteroidSafe_contentDescription">Asteroid is safe.</string>
 </resources>

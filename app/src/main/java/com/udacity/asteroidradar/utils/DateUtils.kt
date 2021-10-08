@@ -38,6 +38,8 @@ class DateUtils {
         ) = SimpleDateFormat(format, locale).format(this)
 
 
+        fun Date.toAsteroidsDateString(): String = this.toFormat(ASTEROIDS_DATE_FORMAT)
+
 
         /**
          * Get string from date in format: "yyyy-MM-dd"
@@ -63,6 +65,18 @@ class DateUtils {
             val calendar = Calendar.getInstance()
             calendar.time = date
             calendar.add(Calendar.DATE, days) //minus number would decrement the days
+            return calendar.time
+        }
+
+        fun getDateOfNextDay(date: Date) = addDays(date, 1)
+
+
+        fun getDateWithoutTime(): Date {
+            val calendar = Calendar.getInstance()
+            calendar[Calendar.HOUR_OF_DAY] = 0
+            calendar[Calendar.MINUTE] = 0
+            calendar[Calendar.SECOND] = 0
+            calendar[Calendar.MILLISECOND] = 0
             return calendar.time
         }
     }

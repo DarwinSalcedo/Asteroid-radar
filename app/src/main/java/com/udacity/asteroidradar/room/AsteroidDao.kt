@@ -10,6 +10,9 @@ import java.util.*
 @Dao
 interface AsteroidDao {
 
+    @Query("select * from DatabaseAsteroid ORDER BY closeApproachDate DESC")
+    fun getAllAsteroids(): LiveData<List<DatabaseAsteroid>>
+
     @Query("select * from DatabaseAsteroid")
     fun getAsteroids(): LiveData<List<DatabaseAsteroid>>
 
@@ -18,4 +21,10 @@ interface AsteroidDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg asteroids: DatabaseAsteroid)
+
+    @Query(
+        "select * from DatabaseAsteroid WHERE closeApproachDate >= :startDate AND closeApproachDate <= :endDate ORDER BY closeApproachDate DESC"
+    )
+    fun getAsteroidsWithinTimeSpan(startDate: Date, endDate: Date): LiveData<List<DatabaseAsteroid>>
+
 }

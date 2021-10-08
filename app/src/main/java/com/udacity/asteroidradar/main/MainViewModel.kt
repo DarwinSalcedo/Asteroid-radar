@@ -2,65 +2,123 @@ package com.udacity.asteroidradar.main
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.domain.Asteroid
+import com.udacity.asteroidradar.DailyPicture
 import com.udacity.asteroidradar.network.AsteroidsApiFilter
+import com.udacity.asteroidradar.network.asDomainModel
 import com.udacity.asteroidradar.repository.AsteroidsRepository
 import com.udacity.asteroidradar.room.AsteroidsDatabase
+import com.udacity.asteroidradar.room.DatabaseAsteroid
+import com.udacity.asteroidradar.utils.DateUtils
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.*
 
-enum class AsteroidsApiStatus { LOADING, ERROR, DONE }
-
-/**
- * The [ViewModel] that is attached to the [MainFragment].
- */
 class MainViewModel(application: Application) : ViewModel() {
 
-    // Internally, we use a MutableLiveData, because we will be updating the List of Asteroids
-    // with new values
-    // private val _asteroids = MutableLiveData<List<Asteroid>>()
-
-    // The external LiveData interface to the property is immutable, so only this class can modify
-    // val asteroids: LiveData<List<Asteroid>>
-    // get() = _asteroids
-
-    // Internally, we use a MutableLiveData to handle navigation to the selected asteroid
     private val _navigateToSelectedAsteroid = MutableLiveData<Asteroid?>()
-
-    // The external immutable LiveData for the navigation asteroid
-    /** If navigation is required, this property contains the [Asteroid] to which we want to navigate.
-     * Tells thereby whether navigation is required. */
     val navigateToSelectedAsteroid: LiveData<Asteroid?>
         get() = _navigateToSelectedAsteroid
 
     private val database = AsteroidsDatabase.getInstance(application)
-
     private val asteroidsRepository = AsteroidsRepository(database)
 
+    var asteroids: LiveData<List<Asteroid>> =
+        Transformations.map(
+            database.asteroidDao.getAsteroidsWithinTimeSpan(
+                DateUtils.getDateWithoutTime(),
+                DateUtils.getDateOfNextDay(DateUtils.getDateWithoutTime())
+            )
+        ) {
+            it.asDomainModel()
+        }
 
-    init {
-        //addExampleData()
-        getAsteroids()
-        // getAsteroids(AsteroidsApiFilter.VIEW_TODAY_ASTEROIDS)
+    var dailyPictureData: LiveData<DailyPicture?> = getDailyPicture()
+
+
+    private fun getDailyPicture(): LiveData<DailyPicture?> {
+        val map = Transformations.map(
+            database.dailyPictureDao.getLastDailyPictureWithImage(DateUtils.getDateWithoutTime())
+        ) {
+            it?.asDomainModel()
+        }
+        return map
     }
 
-    val asteroids = asteroidsRepository.asteroids
+    init {
+        refreshAsteroids()
+        refreshDailyPicture()
+    }
 
-    /**
-     * Gets (filtered) asteroids information from the Asteroids API Retrofit service and
-     * updates the [Asteroid] [List] and [AsteroidsApiStatus] [LiveData].
-     * @param filter the [AsteroidsApiFilter] that is sent as part of the web server request
-     */
-//    private fun getAsteroids(filter: AsteroidsApiFilter) { // todo use filter
-    private fun getAsteroids() {
+    /** Get data of daily image */
+    private fun refreshDailyPicture() {
         viewModelScope.launch {
             try {
-                Timber.i("getAsteroids(): before service call ")
-                asteroidsRepository.refreshAsteroids()
-                Timber.i("getAsteroids(): after service call ")
+                Timber.i("refreshDailyPicture(): before service call ")
+                asteroidsRepository.refreshDailyPicture()
+                Timber.i("refreshDailyPicture(): after service call ")
             } catch (e: Exception) {
-                Timber.i("getAsteroids(): exception ${e.message}")
-                Timber.i("getAsteroids(): exception ${e.stackTrace}")
+                Timber.i("refreshDailyPicture(): exception ${e.message}")
+                Timber.i("refreshDailyPicture(): exception ${e.stackTrace}")
+            }
+        }
+    }
+
+    /** Filters asteroids using an [AsteroidsApiFilter]. */
+    fun filterAsteroids(filter: AsteroidsApiFilter) {
+        Timber.i("filterAsteroids(): filter: $filter")
+        when (filter) {
+            AsteroidsApiFilter.VIEW_TODAY_ASTEROIDS -> {
+                val date = DateUtils.getDateWithoutTime()
+                filterAsteroids(date, date)
+            }
+            AsteroidsApiFilter.VIEW_WEEK_ASTEROIDS -> {
+                val startDate = DateUtils.getDateWithoutTime()
+                filterAsteroids(
+                    startDate,
+                    DateUtils.getDate6DaysLater(startDate)
+                )
+            }
+            else -> {   // show all saved asteroids
+                filterAsteroids()
+            }
+        }
+    }
+
+    /**
+     * Get list of asteroids. Set time span.
+     * We return domain objects, which are agnostic of Network or Database.
+     */
+    private fun filterAsteroids(startDate: Date? = null, endDate: Date? = null) {
+        asteroids = if (startDate != null && endDate != null) {
+            Transformations.map(
+                database.asteroidDao.getAsteroidsWithinTimeSpan(
+                    startDate,
+                    endDate
+                )
+            ) {
+                it.asDomainModel()
+            }
+        } else {
+            val databaseAsteroidsLiveData: LiveData<List<DatabaseAsteroid>> =
+                database.asteroidDao.getAllAsteroids()
+            Transformations.map(databaseAsteroidsLiveData) {
+                it.asDomainModel()
+            }
+        }
+
+        // Timber.i("filterAsteroids() at end, var asteroid contains ${asteroids.value?.count()} asteroids")
+    }
+
+    private fun refreshAsteroids() {
+        viewModelScope.launch {
+            try {
+                Timber.i("refreshAsteroids(): before service call ")
+                asteroidsRepository.refreshAsteroids()
+                Timber.i("refreshAsteroids(): after service call ")
+            } catch (e: Exception) {
+                Timber.i("refreshAsteroids(): exception ${e.message}")
+                Timber.i("refreshAsteroids(): exception ${e.stackTrace}")
             }
         }
     }
