@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout">
+
+    <!--  List item for asteroids list.  -->
+
+    <data>
+        <!-- Data of current asteroid -->
+        <variable
+            name="asteroid"
+            type="com.udacity.asteroidradar.Asteroid" />
+
+        <!-- Currently we tell type but not source of data -->
+        <variable
+            name="clickListener"
+            type="com.udacity.asteroidradar.main.AsteroidListAdapter.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:onClick="@{() -> clickListener.onClick(asteroid)}">
+
+        <TextView
+            android:id="@+id/codename_textview"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
+            android:layout_marginStart="@dimen/spacing_normal"
+            android:layout_marginTop="@dimen/spacing_normal"
+            android:layout_marginEnd="@dimen/spacing_normal"
+            android:background="@color/colorPrimary"
+            android:gravity="bottom|center|start"
+            android:padding="@dimen/padding_item"
+            android:text="@{asteroid.codename}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@android:color/white"
+
+            app:layout_constraintBottom_toTopOf="@id/close_approach_date_textview"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="(2016 BA39)" />
+
+        <TextView
+            android:id="@+id/close_approach_date_textview"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
+            android:layout_marginStart="@dimen/spacing_normal"
+            android:layout_marginEnd="@dimen/spacing_normal"
+            android:layout_marginBottom="@dimen/spacing_normal"
+            android:background="@color/colorPrimary"
+            android:gravity="top"
+
+            android:padding="@dimen/padding_item"
+            android:text="@{asteroid.closeApproachDate.toLocaleString()}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/text_grey"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/codename_textview"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="2020-02-08" />
+        <!-- todo print date without time -->
+
+        <!--        android:textAppearance="?textAppearanceHeadline6"-->
+
+        <ImageView
+            android:id="@+id/asteroid_safety_imageview"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+
+            android:layout_marginEnd="@dimen/spacing_normal"
+            android:contentDescription="@string/icon_asteroid_safety_description"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_status_potentially_hazardous" />
+
+
+        <!--        android:layout_marginBottom="@dimen/spacing_normal"-->
+        <!--        android:layout_marginTop="@dimen/spacing_normal"-->
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
