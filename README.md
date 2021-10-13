@@ -17,6 +17,10 @@ Data Binding
 Navigation
 
 
-#IMPORTANT
+# IMPORTANT
 You should insert a nasa api key in `build.gradle(:app)` > `buildType` section >  `API_KEY`  "\"----Your https://api.nasa.gov API key-----\""
+
+![device-2021-10-13-173803](https://user-images.githubusercontent.com/9206032/137209964-142dc9f5-0d75-4af3-a30b-cbb06c26875f.gif)
+
+
 
