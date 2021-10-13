@@ -1,9 +1,22 @@
-# Purpose of this Folder
+# Asteroid Radar
 
-This folder should contain the scaffolded project files to get a student started on their project. This repo will be added to the Classroom for students to use, so please do not have any solutions in this folder.
+This is a app demo where it shows asteroids near the earth and its detail. 
+I used the follows libs and plugins:
 
-## Note: Android Kotlin Gradle Update
-Use the updated Gradle version in the `~/gradle/wrapper/gradle-wrapper.properties` file:
-```
-distributionUrl = https\://services.gradle.org/distributions/gradle-6.1.1-all.zip
-```
+Retrofit library to download the data from the Internet.
+Moshi to convert the JSON data we are downloading to usable data in the form of custom classes.
+Picasso library to download and cache images (You could also use Glide, but we found it has some issues downloading images from this particular API).
+RecyclerView to display the asteroids in a list.
+
+The Jetpack library:
+
+ViewModel
+Room
+LiveData
+Data Binding
+Navigation
+
+
+#IMPORTANT
+You should insert a nasa api key in `build.gradle(:app)` > `buildType` section >  `API_KEY`  "\"----Your https://api.nasa.gov API key-----\""
+
