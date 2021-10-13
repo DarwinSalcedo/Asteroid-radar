@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.AsteroidListItemBinding
+import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.utils.DateUtils.Companion.toYearMonthsDays
 import timber.log.Timber
 

@@ -67,9 +67,6 @@
             app:layout_constraintTop_toBottomOf="@id/codename_textview"
             app:layout_constraintVertical_chainStyle="packed"
             tools:text="2020-02-08" />
-        <!-- todo print date without time -->
-
-        <!--        android:textAppearance="?textAppearanceHeadline6"-->
 
         <ImageView
             android:id="@+id/asteroid_safety_imageview"

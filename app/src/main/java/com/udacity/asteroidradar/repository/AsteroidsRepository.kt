@@ -1,10 +1,10 @@
 package com.udacity.asteroidradar.repository
 
 
-import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.DailyPicture
 import com.udacity.asteroidradar.api.parseAsteroids
 import com.udacity.asteroidradar.api.parseDailyPicture
+import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.network.asDatabaseModel
 import com.udacity.asteroidradar.room.AsteroidsDatabase
 import com.udacity.asteroidradar.utils.DateUtils
@@ -69,5 +69,15 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
         }
 
         Timber.i("refreshDailyPicture() after server call.")
+    }
+
+    suspend fun deleteAsteroidsBefore(endDate: Date) {
+        Timber.i("deleteAsteroidsBefore() before database call. endDate: $endDate")
+
+        withContext(Dispatchers.IO) {
+            val deletedElementsCount: Int = database.asteroidDao.deleteAllBefore(endDate)
+            Timber.i("deleteAsteroidsBefore() after server call. deleted elements: $deletedElementsCount")
+        }
+        Timber.i("deleteAsteroidsBefore() after server call.")
     }
 }

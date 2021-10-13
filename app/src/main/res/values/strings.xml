@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Asteroid Radar</string>
-
     <string name="next_week_asteroids">View week asteroids</string>
     <string name="today_asteroids">View today asteroids</string>
     <string name="saved_asteroids">View saved asteroids</string>
@@ -29,4 +28,5 @@
     <string name="SafeText">safe</string>
     <string name="asteroidStatusImage_asteroidHazardous_contentDescription">Asteroid is potentially hazardous</string>
     <string name="asteroidStatusImage_asteroidSafe_contentDescription">Asteroid is safe.</string>
+    <string name="astronomical_unit_format_unabbreviated_plural">%f astronomical units.</string>
 </resources>

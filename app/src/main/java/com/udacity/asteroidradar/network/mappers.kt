@@ -1,7 +1,7 @@
 package com.udacity.asteroidradar.network
 
-import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.DailyPicture
+import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.room.DatabaseAsteroid
 import com.udacity.asteroidradar.room.DatabaseDailyPicture
 

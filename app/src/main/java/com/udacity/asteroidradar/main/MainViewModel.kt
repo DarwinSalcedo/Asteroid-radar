@@ -2,14 +2,15 @@ package com.udacity.asteroidradar.main
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.DailyPicture
+import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.network.AsteroidsApiFilter
 import com.udacity.asteroidradar.network.asDomainModel
 import com.udacity.asteroidradar.repository.AsteroidsRepository
 import com.udacity.asteroidradar.room.AsteroidsDatabase
 import com.udacity.asteroidradar.room.DatabaseAsteroid
 import com.udacity.asteroidradar.utils.DateUtils
+import com.udacity.asteroidradar.utils.DateUtils.Companion.getDateAndTimeBeforeOrAfterNow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
@@ -48,6 +49,7 @@ class MainViewModel(application: Application) : ViewModel() {
     init {
         refreshAsteroids()
         refreshDailyPicture()
+        deleteOldUnusedAsteroids()
     }
 
     /** Get data of daily image */
@@ -106,8 +108,6 @@ class MainViewModel(application: Application) : ViewModel() {
                 it.asDomainModel()
             }
         }
-
-        // Timber.i("filterAsteroids() at end, var asteroid contains ${asteroids.value?.count()} asteroids")
     }
 
     private fun refreshAsteroids() {
@@ -136,6 +136,21 @@ class MainViewModel(application: Application) : ViewModel() {
      */
     fun navigateToAsteroidDetailsComplete() {
         _navigateToSelectedAsteroid.value = null
+    }
+
+    private fun deleteOldUnusedAsteroids() {
+        viewModelScope.launch {
+            try {
+                Timber.i("deleteOldUnusedAsteroids(): before service call ")
+                val timeOneWeekBefore = getDateAndTimeBeforeOrAfterNow(-7)
+                Timber.i("deleteOldUnusedAsteroids(): date time: $timeOneWeekBefore")
+                asteroidsRepository.deleteAsteroidsBefore(timeOneWeekBefore)
+                Timber.i("deleteOldUnusedAsteroids(): after service call ")
+            } catch (e: Exception) {
+                Timber.i("deleteOldUnusedAsteroids(): exception ${e.message}")
+                Timber.i("deleteOldUnusedAsteroids(): exception ${e.stackTrace}")
+            }
+        }
     }
 
     /**

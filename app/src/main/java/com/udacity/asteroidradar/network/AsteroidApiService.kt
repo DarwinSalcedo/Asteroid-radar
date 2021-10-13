@@ -2,16 +2,13 @@ package com.udacity.asteroidradar.network
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.udacity.asteroidradar.BuildConfig
 import com.udacity.asteroidradar.domain.Asteroid
-import com.udacity.asteroidradar.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-private const val BASE_URL = Constants.BASE_URL
-private const val API_KEY = Constants.API_KEY
-private const val ASTEROIDS_API_DATE_FORMAT = "yyyy-MM-dd"
 
 enum class AsteroidsApiFilter(val value: String) {
     VIEW_WEEK_ASTEROIDS("view.week.asteroids"),
@@ -33,7 +30,7 @@ private val moshi = Moshi.Builder()
  */
 private val retrofit = Retrofit.Builder()
     .addConverterFactory(MoshiConverterFactory.create(moshi))
-    .baseUrl(BASE_URL)
+    .baseUrl(BuildConfig.URL)
     .build()
 
 /**
@@ -42,12 +39,10 @@ private val retrofit = Retrofit.Builder()
 interface AsteroidApiService {
 
     /**
-     * TODO actualize comment
      * Returns a Coroutine [List] of [Asteroid] which can be fetched with
      * await() if in a Coroutine scope. The @GET annotation indicates that the
      * "planetary/apod" endpoint will be requested with the GET HTTP method
      */
-    //@GET("neo/rest/v1/feed?start_date=2021-04-17&end_date=2021-04-18&api_key=6Q4cMVxnARH5Jlgx976YDc41iz860XEOthEXQtKR")
     @GET("neo/rest/v1/feed")
     suspend fun getAsteroids(
         @Query("start_date")
@@ -55,13 +50,13 @@ interface AsteroidApiService {
         @Query("end_date")
         endDate: String = "2021-04-20",
         @Query("api_key")
-        key: String = API_KEY
+        key: String = BuildConfig.API_KEY
     ): Any
 
     @GET("planetary/apod")
     suspend fun getDailyPictureData(
         @Query("api_key")
-        key: String = API_KEY
+        key: String = BuildConfig.API_KEY
     ): Any
 
     // I need a JsonObject or something I can transform into a JsonObject.
